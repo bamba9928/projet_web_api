@@ -9,8 +9,8 @@ API_TIMEOUT = 20  # Temps limite pour les requêtes API en secondes
 
 class AskiaService:
     BASE_URL = 'https://api.askianet.com/webservice'
-    APP_CLIENT = '@iks@TesT0006'
-    PV_CODE = '6000'
+    APP_CLIENT = ''
+    PV_CODE = ''
 
     @staticmethod
     def call_api(url, params=None, method='GET'):
