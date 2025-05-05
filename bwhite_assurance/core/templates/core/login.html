@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  .fade-in {
+    animation: fadeIn 1.1s ease-in-out both;
+  }
+
+  @keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Style pour le footer */
+  .custom-footer {
+    background: linear-gradient(135deg, #2c3e50, #4a6491);
+    color: white;
+    padding: 2.5rem 0;
+    margin-top: 3rem;
+  }
+
+  .footer-links a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .footer-links a:hover {
+    color: white;
+    text-decoration: underline;
+  }
+
+  .social-icons a {
+    color: white;
+    font-size: 1.2rem;
+    margin-right: 1rem;
+    transition: transform 0.3s;
+  }
+
+  .social-icons a:hover {
+    transform: translateY(-3px);
+  }
+
+  .copyright {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+  }
+</style>
+
+<div class="row justify-content-center align-items-center mt-5 px-3">
+  <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+    <div class="card shadow-lg border-0 rounded-4 fade-in">
+      <div class="card-body p-5 bg-white rounded-4">
+        <div class="text-center mb-4">
+          <h2 class="text-bwhite fw-bold">
+            <i class="fa fa-lock"></i> Connexion
+          </h2>
+          <p class="text-muted small">Connectez-vous pour accéder à votre tableau de bord</p>
+        </div>
+
+        {% if message %}
+          <div class="alert alert-danger text-center">{{ message }}</div>
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label fw-bold">Nom d'utilisateur</label>
+            <input type="text" name="username" class="form-control" placeholder="Entrez votre identifiant" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Mot de passe</label>
+            <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <div class="d-grid">
+            <button type="submit" class="btn btn-bwhite fw-bold py-2">
+              <i class="fa fa-sign-in-alt"></i> Connexion
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

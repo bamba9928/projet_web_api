@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin - Bwhite Digital{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .table {
+        border-radius: 8px !important;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.35em 0.65em;
+    }
+    .bg-opacity-10 {
+        background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+    }
+    .card-header.bg-primary {
+        background-color: #00FF00 !important;
+        color: white !important;
+        border-color: #00FF00 !important;
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0">
+                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard Administrateur
+                </h2>
+                <div>
+                    <a href="{% url 'creer_apporteur' %}" class="btn btn-light btn-sm me-2">
+                        <i class="fas fa-user-plus me-2"></i> Nouvel apporteur
+                    </a>
+                    <a href="{% url 'client_vehicule' %}" class="btn btn-light btn-sm me-2">
+                        <i class="fas fa-user me-2"></i> Nouveau client
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <form method="get" class="row g-3 mb-2" id="filter-form">
+                <div class="col-md-3">
+                    <label for="date_debut" class="form-label fw-bold">Date début</label>
+                    <input type="date" name="date_debut" id="date_debut" value="{{ date_debut }}" class="form-control">
+                </div>
+                <div class="col-md-3">
+                    <label for="date_fin" class="form-label fw-bold">Date fin</label>
+                    <input type="date" name="date_fin" id="date_fin" value="{{ date_fin }}" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label for="apporteur" class="form-label fw-bold">Apporteur</label>
+                    <select name="apporteur" id="apporteur" class="form-select">
+                        <option value="">Tous les apporteurs</option>
+                        {% for a in liste_apporteurs %}
+                            <option value="{{ a.id }}" {% if a.id|stringformat:"s" == request.GET.apporteur %}selected{% endif %}>
+                                {{ a.user.get_full_name }} ({{ a.get_grade_display }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-filter me-2"></i> Filtrer
+                    </button>
+                </div>
+            </form>
+
+            {% if request.GET.apporteur %}
+            <div class="text-end mb-4">
+                <a href="{% url 'profil_apporteur' request.GET.apporteur %}" class="btn btn-outline-dark btn-sm">
+                    <i class="fas fa-user-circle me-1"></i> Voir le profil sélectionné
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card border-primary h-100">
+                        <div class="card-body text-center">
+                            <h6 class="card-subtitle text-muted">Total Contrats</h6>
+                            <h3 class="card-title text-primary mt-2">{{ stats.total_contrats }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-success h-100">
+                        <div class="card-body text-center">
+                            <h6 class="card-subtitle text-muted">Total Primes TTC</h6>
+                            <h3 class="card-title text-success mt-2">{{ stats.total_primes }} FCFA</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-info h-100">
+                        <div class="card-body text-center">
+                            <h6 class="card-subtitle text-muted">Commission à payer</h6>
+                            <h3 class="card-title text-info mt-2">{{ stats.total_commissions }} FCFA</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-file-contract me-2"></i> Contrats récents</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Véhicule</th>
+                                    <th>Effet</th>
+                                    <th>Prime TTC</th>
+                                    <th>Apporteur</th>
+                                    <th>Commission</th>
+                                    <th>Paiement</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contrat in contrats_recents %}
+                                <tr>
+                                    <td>{{ contrat.client }}</td>
+                                    <td>{{ contrat.vehicule }}</td>
+                                    <td>{{ contrat.effet|date:"d/m/Y" }}</td>
+                                    <td>{{ contrat.prime_ttc }} FCFA</td>
+                                    <td>{{ contrat.apporteur.user.get_full_name }}</td>
+                                    <td>
+                                        {% if contrat.paiementapporteur %}
+                                            <span class="badge bg-success">Payé</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Non payé</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if contrat.is_paye %}
+                                            <span class="badge bg-success">Payé</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">En attente</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'documents_contrat' contrat.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-4">Aucun contrat récent.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i> Répartition des commissions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Apporteur</th>
+                                    <th>Contrats</th>
+                                    <th>Primes</th>
+                                    <th>Commission</th>
+                                    <th>Profil</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in commissions %}
+                                <tr>
+                                    <td>{{ c.apporteur.user.get_full_name }}</td>
+                                    <td>{{ c.nb_contrats }}</td>
+                                    <td>{{ c.primes }} FCFA</td>
+                                    <td>{{ c.commission }} FCFA</td>
+                                    <td>
+                                        <a href="{% url 'profil_apporteur' c.apporteur.id %}" class="btn btn-sm btn-outline-success">
+                                            <i class="fas fa-user-circle me-1"></i> Profil
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">Aucun apporteur trouvé.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

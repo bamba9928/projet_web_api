@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Profil Apporteur - Bwhite Digital{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        border-radius: 12px;
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.35em 0.65em;
+    }
+    .bg-header {
+        background-color: #00FF00 !important;
+        color: white !important;
+    }
+    .card-body h3 {
+        font-weight: bold;
+    }
+    .table thead th {
+        background-color: #f8f9fa;
+        font-weight: bold;
+    }
+    .btn-outline-primary {
+        border-color: #00FF00;
+        color: #00FF00;
+    }
+    .btn-outline-primary:hover {
+        background-color: #00FF00;
+        color: white;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header bg-header py-3">
+            <h2 class="mb-0"><i class="fas fa-user-circle me-2"></i>Profil de {{ apporteur.user.get_full_name }}</h2>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <p><strong>Email :</strong> {{ apporteur.user.email }}</p>
+                    <p><strong>Téléphone :</strong> {{ apporteur.telephone }}</p>
+                    <p><strong>Adresse :</strong> {{ apporteur.adresse }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Grade :</strong> {{ apporteur.get_grade_display }}</p>
+                    <p><strong>Date de création :</strong> {{ apporteur.date_creation|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+
+            <div class="row text-center">
+                <div class="col-md-4 mb-3">
+                    <div class="card border-success h-100">
+                        <div class="card-body">
+                            <h6 class="text-muted">Nombre de contrats</h6>
+                            <h3 class="text-success">{{ nombre_contrats }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-primary h-100">
+                        <div class="card-body">
+                            <h6 class="text-muted">Primes générées</h6>
+                            <h3 class="text-primary">{{ total_primes|intcomma }} FCFA</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card border-info h-100">
+                        <div class="card-body">
+                            <h6 class="text-muted">Commissions versées</h6>
+                            <h3 class="text-info">{{ total_commission|intcomma }} FCFA</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contrats -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-file-contract me-2"></i>Contrats</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Véhicule</th>
+                            <th>Date Effet</th>
+                            <th>Prime TTC</th>
+                            <th>Documents</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contrat in contrats %}
+                        <tr>
+                            <td>{{ contrat.client }}</td>
+                            <td>{{ contrat.vehicule }}</td>
+                            <td>{{ contrat.effet|date:"d/m/Y" }}</td>
+                            <td class="fw-bold">{{ contrat.prime_ttc|intcomma }} FCFA</td>
+                            <td>
+                                <a href="{% url 'documents_contrat' contrat.id %}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">
+                                <i class="fas fa-exclamation-circle me-2"></i> Aucun contrat disponible
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paiements -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-money-check-alt me-2"></i>Historique des paiements</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Montant</th>
+                            <th>Contrat</th>
+                            <th>Référence</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for paiement in paiements %}
+                        <tr>
+                            <td>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</td>
+                            <td>{{ paiement.montant|intcomma }} FCFA</td>
+                            <td>{{ paiement.contrat.id_saisie }}</td>
+                            <td>{{ paiement.reference }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                <i class="fas fa-info-circle me-2"></i> Aucun paiement trouvé
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

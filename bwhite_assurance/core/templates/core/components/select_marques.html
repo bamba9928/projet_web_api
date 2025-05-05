@@ -1,0 +1,7 @@
+<select name="marque" class="form-select" id="id_marque">
+  {% for m in marques %}
+    <option value="{{ m.code }}">{{ m.libelle }}</option>
+  {% empty %}
+    <option disabled>Aucune marque disponible</option>
+  {% endfor %}
+</select>

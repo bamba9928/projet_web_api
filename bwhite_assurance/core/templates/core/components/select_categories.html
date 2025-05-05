@@ -1,0 +1,7 @@
+<select name="categorie" class="form-select" id="id_categorie">
+  {% for c in categories %}
+    <option value="{{ c.code }}">{{ c.libelle }}</option>
+  {% empty %}
+    <option disabled>Aucune catégorie disponible</option>
+  {% endfor %}
+</select>

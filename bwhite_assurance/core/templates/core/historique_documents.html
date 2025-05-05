@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0"><i class="fas fa-history me-2"></i> Historique des Documents</h2>
+                <a href="#" class="btn btn-light btn-sm disabled">
+                    <i class="fas fa-file-excel me-2"></i> Exporter CSV (à venir)
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <form class="mb-4">
+                <div class="input-group input-group-lg shadow-sm">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <input type="search"
+                        name="search"
+                        class="form-control border-start-0"
+                        placeholder="Rechercher client, contrat, modèle véhicule..."
+                        hx-get="{% url 'historique_documents_apporteur' %}"
+                        hx-target="#results"
+                        hx-trigger="keyup changed delay:300ms"
+                        hx-push-url="true"
+                        value="{{ request.GET.search|default:'' }}">
+                </div>
+            </form>
+
+            <form class="row g-3 mb-4">
+                <input type="hidden" name="search" value="{{ search }}">
+                <div class="col-md-5">
+                    <label for="date_debut" class="form-label">Du :</label>
+                    <input type="date" class="form-control" name="date_debut" id="date_debut" value="{{ date_debut }}">
+                </div>
+                <div class="col-md-5">
+                    <label for="date_fin" class="form-label">Au :</label>
+                    <input type="date" class="form-control" name="date_fin" id="date_fin" value="{{ date_fin }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-filter me-2"></i>Filtrer
+                    </button>
+                </div>
+            </form>
+
+            <div id="results">
+                <div class="table-responsive rounded-3 shadow-sm">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Client</th>
+                                <th>Véhicule</th>
+                                <th>Effet</th>
+                                <th>Contrat</th>
+                                <th>Paiement</th>
+                                <th>Documents</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for contrat in contrats %}
+                            <tr>
+                                <td>{{ contrat.client.nom }} {{ contrat.client.prenom }}</td>
+                                <td>{{ contrat.vehicule.marque }} - {{ contrat.vehicule.modele }}</td>
+                                <td>{{ contrat.effet|date:"d/m/Y" }}</td>
+                                <td><span class="badge bg-secondary">{{ contrat.id_saisie }}</span></td>
+                                <td>
+                                    {% if contrat.paiementapporteur %}
+                                        <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Payé</span>
+                                    {% else %}
+                                        <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i> Non payé</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'documents_contrat' contrat.id %}" class="text-decoration-none me-2" title="Carte grise">
+                                        <i class="fas fa-id-card text-primary"></i>
+                                    </a>
+                                    <a href="{% url 'documents_contrat' contrat.id %}" class="text-decoration-none me-2" title="Attestation">
+                                        <i class="fas fa-certificate text-success"></i>
+                                    </a>
+                                    <a href="{% url 'documents_contrat' contrat.id %}" class="text-decoration-none" title="Quittance">
+                                        <i class="fas fa-file-invoice text-warning"></i>
+                                    </a>
+                                </td>
+                                <td class="text-end">
+                                    <a href="{% url 'documents_contrat' contrat.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                        <i class="fas fa-eye me-1"></i> Voir
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-muted">
+                                    <i class="fas fa-exclamation-circle me-2"></i> Aucun document trouvé
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if contrats.paginator.num_pages > 1 %}
+                <nav class="mt-4" aria-label="Pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if contrats.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ contrats.previous_page_number }}&search={{ request.GET.search }}">←</a>
+                        </li>
+                        {% endif %}
+                        {% for num in contrats.paginator.page_range %}
+                            <li class="page-item {% if num == contrats.number %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}&search={{ request.GET.search }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+                        {% if contrats.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ contrats.next_page_number }}&search={{ request.GET.search }}">→</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .table th, .table td {
+        vertical-align: middle !important;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 255, 0, 0.05);
+    }
+    .badge {
+        font-size: 0.85rem;
+    }
+</style>
+{% endblock %}

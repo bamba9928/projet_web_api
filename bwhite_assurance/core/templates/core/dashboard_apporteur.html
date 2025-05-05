@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Apporteur - Bwhite Digital{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .table {
+        border-radius: 8px !important;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .input-group-text {
+        transition: all 0.3s ease;
+    }
+    .input-group:focus-within .input-group-text {
+        color: #0d6efd;
+    }
+    .bg-opacity-10 {
+        background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+    }
+    .card-header.bg-primary {
+        background-color: #00FF00 !important;
+        color: white !important;
+        border-color: #00FF00 !important;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h4 mb-0">
+                    <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord
+                </h2>
+                <a href="{% url 'client_vehicule' %}" class="btn btn-light btn-sm">
+                    <i class="fas fa-user-plus me-2"></i> Nouveau client
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="text-center mb-4">
+                <h1 class="display-5 fw-bold text-uppercase text-success">
+                    {{ apporteur.user.get_full_name }}
+                </h1>
+                <p class="lead text-muted">Bienvenue sur votre espace Apporteur</p>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <div class="card border-success h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-subtitle text-muted">Primes générées</h6>
+                                    <h3 class="card-title text-success mt-2">{{ total_primes }} FCFA</h3>
+                                </div>
+                                <div class="bg-success bg-opacity-10 p-3 rounded">
+                                    <i class="fas fa-coins text-success fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-primary h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="card-subtitle text-muted">Commission ({{ apporteur.pourcentage_prime }}%)</h6>
+                                    <h3 class="card-title text-primary mt-2">{{ commission|floatformat:0 }} FCFA</h3>
+                                </div>
+                                <div class="bg-primary bg-opacity-10 p-3 rounded">
+                                    <i class="fas fa-hand-holding-usd text-primary fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <div class="input-group input-group-lg shadow-sm">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="search"
+                           name="search"
+                           class="form-control border-start-0"
+                           placeholder="Rechercher client, contrat..."
+                           hx-get="{% url 'dashboard_apporteur' %}"
+                           hx-trigger="keyup changed delay:300ms from:input"
+                           hx-target="#table-contrats"
+                           hx-push-url="true">
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-file-contract me-2"></i>Contrats récents</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" id="table-contrats">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col" class="fw-bold py-3"><i class="fas fa-calendar me-2"></i>Date</th>
+                                    <th scope="col" class="fw-bold py-3"><i class="fas fa-user me-2"></i>Client</th>
+                                    <th scope="col" class="fw-bold py-3"><i class="fas fa-money-bill-wave me-2"></i>Montant TTC</th>
+                                    <th scope="col" class="fw-bold py-3"><i class="fas fa-play me-2"></i>Effet</th>
+                                    <th scope="col" class="fw-bold py-3"><i class="fas fa-check-double me-2"></i>Paiement</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contrat in contrats %}
+                                <tr class="align-middle">
+                                    <td>{{ contrat.date_creation|date:"d/m/Y" }}</td>
+                                    <td>{{ contrat.client }}</td>
+                                    <td class="fw-bold">{{ contrat.prime_ttc }} FCFA</td>
+                                    <td>{{ contrat.effet|date:"d/m/Y" }}</td>
+                                    <td>
+                                        {% if contrat.is_paye %}
+                                            <span class="badge bg-success">Payé</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Non payé</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">
+                                        <i class="fas fa-exclamation-circle me-2"></i> Aucun contrat trouvé
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

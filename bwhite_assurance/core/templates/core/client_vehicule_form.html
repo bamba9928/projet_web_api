@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}Nouveau Client{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0">
+        <div class="card-header text-white" style="background-color: #00FF00;">
+            <h2 class="h4 mb-0">Nouveau Client</h2>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" class="row g-4 needs-validation" novalidate>
+                {% csrf_token %}
+
+                <div class="col-12">
+                    <h5 style="color: #00FF00;" class="mb-3 text-center border-bottom pb-2">Informations Client</h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">{{ client_form.prenom.label }}</label>
+                    {{ client_form.prenom|add_class:"form-control form-control-lg"|attr:"placeholder:Entrez le prénom" }}
+                    {% if client_form.prenom.errors %}
+                        <div class="invalid-feedback d-block">{{ client_form.prenom.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">{{ client_form.nom.label }}</label>
+                    {{ client_form.nom|add_class:"form-control form-control-lg"|attr:"placeholder:Entrez le nom" }}
+                    {% if client_form.nom.errors %}
+                        <div class="invalid-feedback d-block">{{ client_form.nom.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">{{ client_form.adresse.label }}</label>
+                    {{ client_form.adresse|add_class:"form-control form-control-lg"|attr:"placeholder:Adresse complète" }}
+                    {% if client_form.adresse.errors %}
+                        <div class="invalid-feedback d-block">{{ client_form.adresse.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">{{ client_form.num_tel.label }}</label>
+                    <div class="input-group">
+                        <span class="input-group-text">+221</span>
+                        {{ client_form.num_tel|add_class:"form-control form-control-lg"|attr:"placeholder:7xxxxxxxxx" }}
+                    </div>
+                    {% if client_form.num_tel.errors %}
+                        <div class="invalid-feedback d-block">{{ client_form.num_tel.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-12 mt-4">
+                    <h5 style="color: #00FF00;" class="text-center mb-3 border-bottom pb-2">Informations Véhicule</h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">{{ vehprjct.com.vehicule_form.immatriculation.label }}</label>
+                    {{ vehicule_form.immatriculation|add_class:"form-control form-control-lg"|attr:"placeholder:Ex: AA123BC" }}
+                    {% if vehicule_form.immatriculation.errors %}
+                        <div class="invalid-feedback d-block">{{ vehicule_form.immatriculation.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Marque</label>
+                    <div id="marque-container"
+                        hx-get="{% url 'get_marques' %}" hx-trigger="load"
+                        hx-target="this" hx-swap="innerHTML">
+                        <select class="form-select form-select-lg">
+                            <option>Chargement des marques...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">{{ vehicule_form.modele.label }}</label>
+                    {{ vehicule_form.modele|add_class:"form-control form-control-lg"|attr:"placeholder:Modèle du véhicule" }}
+                    {% if vehicule_form.modele.errors %}
+                        <div class="invalid-feedback d-block">{{ vehicule_form.modele.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold">Catégorie</label>
+                    <div id="categorie-container"
+                        hx-get="{% url 'get_categories' %}" hx-trigger="load"
+                        hx-target="this" hx-swap="innerHTML">
+                        <select class="form-select form-select-lg">
+                            <option>Chargement des catégories...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">{{ vehicule_form.puissance_fiscale.label }}</label>
+                    {{ vehicule_form.puissance_fiscale|add_class:"form-control form-control-lg" }}
+                    {% if vehicule_form.puissance_fiscale.errors %}
+                        <div class="invalid-feedback d-block">{{ vehicule_form.puissance_fiscale.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">{{ vehicule_form.energie.label }}</label>
+                    {{ vehicule_form.energie|add_class:"form-select form-select-lg" }}
+                    {% if vehicule_form.energie.errors %}
+                        <div class="invalid-feedback d-block">{{ vehicule_form.energie.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">{{ vehicule_form.nombre_places.label }}</label>
+                    {{ vehicule_form.nombre_places|add_class:"form-control form-control-lg" }}
+                    {% if vehicule_form.nombre_places.errors %}
+                        <div class="invalid-feedback d-block">{{ vehicule_form.nombre_places.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="col-12 text-center mt-5">
+                    <button type="submit" class="btn btn-lg px-5 py-3 fw-bold rounded-pill" style="background-color: #00FF00; color: white;">
+                        <i class="bi bi-check-circle me-2"></i>Continuer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control-lg, .form-select-lg {
+        padding: 0.75rem 1rem;
+        font-size: 1.05rem;
+    }
+    .card {
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    .invalid-feedback {
+        font-size: 0.9rem;
+    }
+</style>
+{% endblock %}

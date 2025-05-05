@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="card shadow-lg border-0">
+    <div class="card-header bg-primary text-white py-3">
+      <h3 class="h4 mb-0 text-center">
+        <i class="fas fa-user-plus me-2"></i>Création d'un Apporteur
+      </h3>
+    </div>
+
+    <div class="card-body p-4">
+      {% if form.errors %}
+      <div class="alert alert-danger alert-dismissible fade show">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <h5><i class="fas fa-exclamation-triangle me-2"></i>Erreurs dans le formulaire</h5>
+        <ul class="mb-0">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <form method="post" class="row g-4">
+        {% csrf_token %}
+
+        <!-- Informations de base -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">{{ form.prenom.label }}</label>
+          {% render_field form.prenom class="form-control" placeholder="Prénom" %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-bold">{{ form.nom.label }}</label>
+          {% render_field form.nom class="form-control" placeholder="Nom" %}
+        </div>
+
+        <!-- Email et mot de passe -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">{{ form.email.label }}</label>
+          {% render_field form.email class="form-control" placeholder="email@exemple.com" %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-bold">{{ form.mot_de_passe.label }}</label>
+          <div class="input-group">
+            {% render_field form.mot_de_passe class="form-control" placeholder="••••••••" %}
+            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Téléphone -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">{{ form.telephone.label }}</label>
+          {% render_field form.telephone class="form-control" placeholder="Numéro de téléphone" %}
+        </div>
+
+        <!-- Adresse et grade -->
+        <div class="col-md-6">
+          <label class="form-label fw-bold">{{ form.adresse.label }}</label>
+          {% render_field form.adresse class="form-control" placeholder="Adresse complète" %}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-bold">{{ form.grade.label }}</label>
+          {% render_field form.grade class="form-select" %}
+          <div class="form-text small mt-2">
+            <i class="fas fa-info-circle text-primary me-1"></i>
+            Platine: 18% + 2000 FCFA | Freemium: 10% + 1800 FCFA
+          </div>
+        </div>
+
+        <div class="col-12 text-center mt-4">
+          <button type="submit" class="btn btn-primary px-5 py-2">
+            <i class="fas fa-save me-2"></i> Enregistrer l'apporteur
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.querySelector('input[name="mot_de_passe"]');
+    const icon = this.querySelector('i');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+});
+</script>
+
+<style>
+  .card {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .form-control, .form-select {
+    padding: 0.75rem 1rem;
+  }
+  .btn-primary {
+    border-radius: 8px;
+    min-width: 200px;
+  }
+  #togglePassword {
+    border-radius: 0 5px 5px 0;
+  }
+  .card-header.bg-primary {
+    background-color: #00FF00 !important;
+    color: white !important;
+    border-color: #00FF00 !important;
+  }
+</style>
+{% endblock %}

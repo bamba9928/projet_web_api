@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block title %}Nouveau Contrat{% endblock %}
+
+{% block content %}
+<div class="card-body p-4">
+    <!-- En-tête avec Code Client et ID Saisie sur la même ligne -->
+    <div class="info-header d-flex justify-content-between mb-4">
+        <div class="info-card">
+            <div class="info-icon">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <div class="info-content">
+                <span class="info-label">Code Client</span>
+                <span class="info-value">{{ cli_code }}</span>
+            </div>
+        </div>
+
+        {% if simulation_result %}
+        <div class="info-card">
+            <div class="info-icon">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <div class="info-content">
+                <span class="info-label">ID Saisie</span>
+                <span class="info-value">{{ simulation_result.idSaisie }}</span>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if not simulation_result %}
+    <!-- Formulaire de Simulation -->
+    <div class="card shadow-sm border-0 mb-4 form-card">
+        <div class="card-header text-center">
+            <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>Ajouter Contrat</h5>
+        </div>
+        <div class="card-body p-4">
+            <form method="post" class="row g-4">
+                {% csrf_token %}
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Durée</label>
+                    {{ form.duree|add_class:"form-select modern-select" }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Début</label>
+                    {{ form.effet|add_class:"form-control modern-input"|attr:"type:date" }}
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" name="simuler" class="btn btn-primary w-100 py-2">
+                        <i class="fas fa-play me-2"></i> Soumettre
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if simulation_result %}
+    <!-- Coût de l'Assurance -->
+    <div class="card border-0 shadow-sm mb-4 cost-card">
+        <div class="card-header text-white py-3">
+            <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Coût de l'Assurance</h5>
+        </div>
+        <div class="card-body p-4">
+            <!-- Informations principales -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="price-card primary">
+                        <h6>Prime Nette</h6>
+                        <div class="price">{{ simulation_result.primenette|default:"0" }} <span>FCFA</span></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="price-card danger">
+                        <h6>Taxes</h6>
+                        <div class="price">{{ simulation_result.taxe|default:"0" }} <span>FCFA</span></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="price-card success">
+                        <h6>Prime TTC</h6>
+                        <div class="price">{{ simulation_result.primettc|default:"0" }} <span>FCFA</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations secondaires -->
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="price-card secondary">
+                        <h6>Accessoire</h6>
+                        <div class="price-sm">{{ simulation_result.accessoire|default:"0" }} <span>FCFA</span></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="price-card secondary">
+                        <h6>Commission</h6>
+                        <div class="price-sm">{{ simulation_result.commission|default:"0" }} <span>FCFA</span></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="price-card secondary">
+                        <h6>FGA</h6>
+                        <div class="price-sm">{{ simulation_result.fga|default:"0" }} <span>FCFA</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Informations Client et Véhicule -->
+    <div class="row g-4 mb-4">
+        <!-- Section Client -->
+        <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm info-detail-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-user me-2"></i>Informations Client</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="info-list">
+                        <div class="info-item">
+                            <div class="info-label">Nom</div>
+                            <div class="info-value">{{ client.nom }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Prénom</div>
+                            <div class="info-value">{{ client.prenom }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Téléphone</div>
+                            <div class="info-value">{{ client.num_tel }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Adresse</div>
+                            <div class="info-value">{{ client.adresse }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Véhicule -->
+        <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm info-detail-card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-car me-2"></i>Informations Véhicule</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="info-list">
+                        <div class="info-item">
+                            <div class="info-label">Immatriculation</div>
+                            <div class="info-value">{{ vehicule.immatriculation }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Marque</div>
+                            <div class="info-value">{{ marque_nom }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Modèle</div>
+                            <div class="info-value">{{ vehicule.modele }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Catégorie</div>
+                            <div class="info-value">{{ categorie_nom }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Puissance</div>
+                            <div class="info-value">{{ vehicule.puissance_fiscale }} CV</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Places</div>
+                            <div class="info-value">{{ vehicule.nombre_places }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if simulation_result %}
+    <!-- Boutons Confirmer/Retour -->
+    <form method="post" class="mt-4 text-center">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <button type="submit" name="acheter" class="btn btn-success btn-lg">
+                <i class="fas fa-check-circle me-2"></i> Confirmer
+            </button>
+            <a href="{% url 'client_vehicule' %}" class="btn btn-outline-secondary btn-lg ms-3">
+                <i class="fas fa-arrow-left me-2"></i> Annuler
+            </a>
+        </div>
+    </form>
+    {% endif %}
+
+    {% if achat_result and not achat_result.error and not simulation_result %}
+    <div class="success-panel mt-4">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h4 class="success-title">Contrat {{ achat_result.id_saisie }} enregistré avec succès !</h4>
+        <div class="success-actions">
+            <a href="{% url 'documents_contrat' achat_result.id %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-file-pdf me-2"></i> Télécharger les documents
+            </a>
+            <a href="{% url 'dashboard_apporteur' %}" class="btn btn-outline-secondary btn-lg">
+                <i class="fas fa-home me-2"></i> Dashboard
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+/* Styles généraux */
+.card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 1rem 1.5rem;
+}
+
+.cost-card .card-header {
+    background-color: #28a745;
+}
+
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.6rem 1.5rem;
+}
+
+.btn-lg {
+    padding: 0.8rem 2rem;
+}
+
+.btn-primary {
+    background-color: #00FF00;
+    border-color: #00FF00;
+}
+
+.btn-primary:hover {
+    background-color: #00dd00;
+    border-color: #00dd00;
+}
+
+/* En-tête avec Code Client et ID Saisie */
+.info-header {
+    margin-bottom: 2rem;
+}
+
+.info-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.info-icon {
+    font-size: 1.5rem;
+    color: #28a745;
+    margin-right: 1rem;
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.info-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+/* Cartes de prix */
+.price-card {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    height: 100%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.price-card.primary {
+    border-left: 4px solid #007bff;
+}
+
+.price-card.success {
+    border-left: 4px solid #28a745;
+}
+
+.price-card.danger {
+    border-left: 4px solid #dc3545;
+}
+
+.price-card.secondary {
+    border-left: 4px solid #6c757d;
+}
+
+.price-card h6 {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+.price-sm {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.price span, .price-sm span {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+/* Informations détaillées */
+.info-detail-card .card-header {
+    background-color: #f8f9fa;
+    border-bottom: none;
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-item {
+    display: flex;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-item .info-label {
+    font-weight: 600;
+    color: #495057;
+    width: 40%;
+}
+
+.info-item .info-value {
+    font-weight: 500;
+    color: #212529;
+    width: 60%;
+}
+
+/* Message de succès */
+.success-panel {
+    background-color: #f8fff8;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.success-icon {
+    font-size: 3rem;
+    color: #28a745;
+    margin-bottom: 1rem;
+}
+
+.success-title {
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #212529;
+}
+
+.success-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+/* Formulaire */
+.modern-select, .modern-input {
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.1);
+    font-size: 1rem;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Documents Contrat - {{ contrat.id_saisie }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow-lg border-0">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+                <i class="fas fa-file-alt me-2"></i> Documents du Contrat #{{ contrat.id_saisie }}
+            </h3>
+        </div>
+        <div class="card-body">
+            <!-- Infos du contrat -->
+            <div class="mb-4">
+                <h5><i class="fas fa-user me-1"></i> Client : {{ contrat.client }}</h5>
+                <p><i class="fas fa-car me-1"></i> Véhicule : {{ contrat.vehicule }}</p>
+                <p><i class="fas fa-calendar-day me-1"></i> Date effet : {{ contrat.effet|date:"d/m/Y" }}</p>
+                <p><i class="fas fa-money-bill-wave me-1"></i> Prime TTC : <strong>{{ contrat.prime_ttc }} FCFA</strong></p>
+                {% if contrat.numero_police %}
+                    <p><i class="fas fa-file-signature me-1"></i> N° Police : {{ contrat.numero_police }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Liens de téléchargement -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <i class="fas fa-download me-2"></i> Téléchargement des documents
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-3">
+                        {% if quittance %}
+                            <a href="{{ quittance.lienPdf }}" class="btn btn-outline-dark" target="_blank">
+                                <i class="fas fa-file-invoice-dollar me-1"></i> Quittance
+                            </a>
+                        {% endif %}
+                        {% if carte_grise %}
+                            <a href="{{ carte_grise.lienPdf }}" class="btn btn-outline-secondary" target="_blank">
+                                <i class="fas fa-car me-1"></i> Carte Grise
+                            </a>
+                        {% endif %}
+                        {% if lien_attestation %}
+                            <a href="{{ lien_attestation }}" class="btn btn-outline-primary" target="_blank">
+                                <i class="fas fa-shield-alt me-1"></i> Attestation
+                            </a>
+                        {% endif %}
+                        {% if lien_cartebrune %}
+                            <a href="{{ lien_cartebrune }}" class="btn btn-outline-warning" target="_blank">
+                                <i class="fas fa-globe-africa me-1"></i> Carte Brune CEDEAO
+                            </a>
+                        {% endif %}
+                    </div>
+                    {% if not (lien_attestation or lien_cartebrune) %}
+                        <div class="alert alert-warning mt-4">
+                            <i class="fas fa-exclamation-triangle me-1"></i> Les liens d'attestation ne sont pas encore disponibles.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Bouton retour -->
+            <div class="text-end">
+                {% if request.user.is_staff %}
+                    <a href="{% url 'dashboard_admin' %}" class="btn btn-outline-success">
+                        <i class="fas fa-arrow-left me-1"></i> Retour Dashboard Admin
+                    </a>
+                {% else %}
+                    <a href="{% url 'dashboard_apporteur' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-1"></i> Retour Tableau Apporteur
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .btn {
+        min-width: 200px;
+    }
+</style>
+{% endblock %}
