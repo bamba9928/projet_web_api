@@ -5,7 +5,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'DIENGdjango-insecure-#u$kj0z8f7v6rx_=5x6#j^bz^LEtz2MEILLEUR2025a5k6egb3gy=jq3dp!6+djh//[]~~~``12-=bcnhBAMBA'
+SECRET_KEY = ''
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -104,10 +104,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-import os
-from pathlib import Path
-
-
 # Chemins statiques
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'core' / 'static']  # seulement pour fichiers dev (non collectés)
@@ -128,3 +124,24 @@ WHITENOISE_USE_FINDERS = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/connexion/'
+
+# Active la redirection automatique vers HTTPS
+SECURE_SSL_REDIRECT = True
+
+# Active le cookie sécurisé (important pour le login/session)
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Active la protection HSTS (pour dire au navigateur d'utiliser toujours HTTPS)
+SECURE_HSTS_SECONDS = 31536000  # 1 an
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+
+# Évite les attaques XSS en ne permettant pas le chargement de contenu mixte
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Requis en production
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
